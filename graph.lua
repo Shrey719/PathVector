@@ -87,6 +87,25 @@ function Graph(dimensions)
         return {bestWord, math.sqrt(bestDist)}
     end
 
+    -- start: starting word
+    -- n: amount of tokens
+    -- random: flag to see if random gen is allowed
+    function obj:generate(start, n, random) 
+        local sentence = {start}
+        local current = start
+
+        for i = 1, n do
+            local nearest = self:closest(current, random)
+            if not nearest or not nearest[1] then break end  -- no more words
+            local next_word = nearest[1]
+
+            table.insert(sentence, next_word)
+            current = next_word
+        end
+
+        return table.concat(sentence, " ")
+    end
+
     return obj
 end
 
