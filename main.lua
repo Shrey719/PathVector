@@ -2,9 +2,9 @@ require("graph")
 require("train")
 require("data")
 
-local Hello = Graph(1024)
+local Hello = Graph(50)
 
-train(Hello, data, 10, 0.1)
+train(Hello, data, 10, 0.1, 5)
 
 local keys = {}
 for k in pairs(Hello.map) do
@@ -14,6 +14,6 @@ local startingWord = keys[math.random(#keys)]
 -- [1] = startingword 
 -- [2] = token amount 
 -- [3] = randomness (KEEP ON, OTHERWISE BULLSHIT IS OUTPUTTED)
--- [4] = context window
 print(#keys)
-print(Hello:generate(startingWord, 50, true, 10))
+print(Hello:generate('i', 50, true))
+print(math.sqrt(math.random())/10)

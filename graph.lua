@@ -62,29 +62,44 @@ function Graph(dimensions)
     -- query: a string (no spaces, single word)
     -- random: boolean, if true, will add a random number to every vector distance
     function obj:closest(query, random)
-        local bestWord, bestDist = nil, math.huge
+        local bestWord, bestScore = nil, -math.huge
         local qVec = self:get(query)
         if not qVec then return nil end
 
-        for word, vec in pairs(self.map) do
-            -- goto's usually make spaghetti, so just note that ::skip:: is located at the end of this for loop
-            if word == query then goto skip end
-            local dist = 0
-            for i = 1, #vec do
-                local diff = vec[i] - qVec[i]
-                if random == true then
-                    dist = dist + diff * diff + math.sqrt(math.random())/10
-                else dist = dist + diff * diff
+        -- precompute magnitude
+        local qMag = 0
+        for i = 1, #qVec do
+            qMag = qMag + qVec[i]^2
+        end
+        qMag = math.sqrt(qMag)
 
-                end 
+        for word, vec in pairs(self.map) do
+            -- goto's make spaghetti: note that this skips to the end of the for loop
+            if word == query then goto skip end
+
+            local dot = 0
+            local vMag = 0
+            for i = 1, #vec do
+                dot = dot + qVec[i] * vec[i]
+                vMag = vMag + vec[i]^2
             end
-            if dist < bestDist then
-                bestDist = dist
+            vMag = math.sqrt(vMag)
+
+            local cosSim = dot / (qMag * vMag)
+            -- random so it doesnt get stuck
+            if random then
+                cosSim = cosSim + (math.random() - 0.5) / 10
+            end
+
+            if cosSim > bestScore then
+                bestScore = cosSim
                 bestWord = word
             end
+
             ::skip::
         end
-        return {bestWord, math.sqrt(bestDist)}
+
+        return {bestWord, bestScore} 
     end
 
     -- start: starting word
